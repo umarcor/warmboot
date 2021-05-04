@@ -39,10 +39,49 @@ https://folknologylabs.wordpress.com/2016/07/21/a-perfect-storm/[myStorm],
 https://mystorm.uk/we-forecast-blackice-this-winter-2/[BlackIce],
 https://github.com/Agilack/eCow-logic[eCow-Logic],
 http://tinyfpga.com/[TinyFPGA]...
-(see https://hdl.github.io/awesome/boards/[hdl.github.io/awesome/boards]).
+See https://hdl.github.io/awesome/boards/[hdl.github.io/awesome/boards].
 
-This site documents existing examples, bootloaders and references about dynamic reconfiguration through the cold/boot
-feature available in iCE40 FPGAs.
+This site documents existing examples, bootloaders and references about dynamic reconfiguration through the cold/warm
+boot feature available in iCE40 FPGAs.
+
+== Context
+
+This article, examples and tool enhancements are the joint effort of several people.
+
+In 2015, Claire (@clairexen) released Icestorm, including icemulti.
+
+In March 2017, Juanma (@juanmard) and Unai (@umarcor) met and the latter introduced the former to the concept of
+(partial) dynamic reconfiguration in FPGAs (using high-end devices as a market reference).
+Juanma was eagger to know more about it, so Unai analysed the configuration options in the iCE40 family manuals and
+datasheets; then explaining the possibilities that warm/cold boot provided.
+During a couple of months, a continuous feedback was built.
+Juanma, modified IceStorm's icemulti and iceprog for prototyping and proving the features, while Unai
+proposed solutions for extending the scope beyond four addressable images (see <<Hypothesis>>).
+Juanma published a https://github.com/juanmard/screen-warmboot[demo] and enhancements to icemulti and iceprog were
+made available in https://github.com/juanmard/icestorm[juanmard/icestorm].
+
+In January 2018, independently, Luke (@tinyfpga) developed the https://github.com/tinyfpga/TinyFPGA-Bootloader[TinyFPGA-Bootloader].
+That one implemented an USB to SPI core for using the reset image as a passthrough for programming the flash memory.
+Therefore, although warm/cold boot are not explicitly mentioned in the description, it was, as far as we are aware, the
+first open source and documented practical use of the feature.
+
+In December 2018, Luke helped Tim (@mithro) and Sean (@xobs) implement the https://github.com/im-tomu/foboot[im-tomu/foboot].
+It was also based on loading a bootloader upon reset for allowing programming a user image in one of the cold/warm boot
+addresses.
+However, due to size constraints, it's a completely different implementation based on a soft core.
+
+In May 2021, Sylvain (@sylefeb) and Bruno (@brunolevy01) were discussing about SPI-flash difficulties on Twitter,
+when Unai jumped in and let them know about the existing work done together with Juanma, as well as the similarities
+with both TinyFPGA and FOMU bootloaders.
+As it happened four years earlier, Sylvain got so excited about the feature and a nice feedback was built between him
+and Juanma.
+Sylvain implemented a https://twitter.com/sylefeb/status/1388586566591913985[demo] and a
+https://github.com/sylefeb/Silice/blob/draft/projects/ice40-warmboot[tutorial] about warmboot.
+Within less than a couple of days, he implemented the first actual demo using 4+ images (8 precisely):
+https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[Dynamic warm boot on the ice40, proof of concept].
+
+Overall, this document is an attempt at gathering the information that all those projects have in common (from a
+theoretical/technical point of view) and for linking to all the specific implementations and examples.
 
 == Introduction to iCE40 configuration modes
 
@@ -319,6 +358,9 @@ That replaces the external pins used for cold-boot.
 
 _TBW_
 
+* https://github.com/juanmard/screen-warmboot[juanmard/screen-warmboot]
+* https://github.com/sylefeb/Silice/blob/draft/projects/ice40-warmboot/README.md[sylefeb/Silice: draft/projects/ice40-warmboot]
+
 == Beyond four images/bitstreams
 
 After diving into the existing documentation, and having performed some experiments, the contributors to this project
@@ -370,12 +412,48 @@ functional result. See the specific documentation of each of the examples.
 
 === Software
 
+The upstream icemulti allows packing up to four images for using the default cold/warm boot features.
+It also allows the power on reset image.
+However, it does not currently support features beyond the default usage.
+
+@juanmard extended both icemulti and iceprog for allowing packing any number of images, up to the size of the target
+memory.
+See https://github.com/juanmard/icestorm[juanmard/icestorm].
+It also allowed modifying entries in the header/applet for switching the addressable images efficiently.
+Moreover, he used some spare bytes at the beginning of each image for writing an string identifier of the bitstream.
+That allows listing the content of the memory (through iceprog) and getting a human readable output.
+
+@sylefeb complemented @juanmard's solution by writing a hot-swap HDL core that can manipulate the header/applet in the
+external memory, so that an external CPU or PC is not required for switching addresses/pointers.
+Furthermore, he cleverly implemented it by employing an unused region of the external memory as an scratchpad and
+modifying the header, on the fly (while passing through a reduced footprint HDL).
+Chunks of 256 bytes are used.
+The actual HDL is a RISC-V soft core requiring ~2K LUTs.
+Yet, as he explains in https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[sylefeb/Silice: draft/projects/ice40-dynboot], there is room for improvement there!
+
+==== Compression
+
 From the potentially hundreds of images available in external memory, only five of them can be directly loaded by the FPGA.
 Therefore, all others can be stored in a compressed format.
 From a software point of view, there are many compression algorithms adapted for being executed on low power/performance
 embedded devices.
+It might be more challenging to achieve it with a pure HDL solution.
+Still, dictionary or block based compressions such as LZO might be efficient enough.
+Some quick experiments show that the size of each bitstream can be reduced to 3-5% (from 32KB to 1-1.6KB) by using `lzop`.
 
-_TBW_
+* https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Oberhumer[wikipedia: Lempel–Ziv–Oberhumer (LZO)]
+** https://github.com/torvalds/linux/blob/master/lib/decompress_unlzo.c
+* https://en.wikibooks.org/wiki/Data_Compression/Dictionary_compression
+* https://catchchallenger.first-world.info/wiki/Quick_Benchmark:_Gzip_vs_Bzip2_vs_LZMA_vs_XZ_vs_LZ4_vs_LZO
+
+==== Preserving BRAM data
+
+It would be interesting to know whether BRAM data is necessarily overwritten when a new bitstream is loaded.
+If so, it might be possible to use the pipeline approach from Sylvain for hot-replacing the content of the BRAMs when an
+image is changed.
+That would allow the implementation of complex algorithms on the same data.
+The advantage would be that freshly loaded images could start computation straightaway after load.
+However, depending on the use case, it might more efficient to have some custom save/load mechanism.
 
 ==== Tests
 
@@ -411,8 +489,19 @@ _TBW_
 == References
 
 * http://www.latticesemi.com/-/media/LatticeSemi/Documents/ApplicationNotes/IK/iCE40ProgrammingandConfiguration.ashx[iCE40 Programming and Configuration (Technical Note TN1248)]
+* http://www.latticesemi.com/view_document?document_id=50701[iCEstick User Manual]
+* https://github.com/clairexen[@clairexen]
+** http://bygone.clairexen.net/icestorm/format.html[bygone.clairexen.net/icestorm/format]
+** https://github.com/YosysHQ/icestorm/blob/master/icemulti[YosysHQ/icestorm: icemulti]
 * https://github.com/juanmard[@juanmard]
 ** https://github.com/juanmard/icestorm[juanmard/icestorm]
 ** https://github.com/juanmard/screen-warmboot[juanmard/screen-warmboot]
 ** https://github.com/juanmard/collection-Pong[juanmard/collection-Pong]
+* https://github.com/tinyfpga/TinyFPGA-Bootloader[tinyfpga/TinyFPGA-Bootloader]
+** https://github.com/mattvenn/understanding-tinyfpga-bootloader[mattvenn/understanding-tinyfpga-bootloader]
 * https://github.com/im-tomu/foboot[im-tomu/foboot]
+* https://github.com/sylefeb[@sylefeb]
+** https://github.com/sylefeb/Silice/blob/draft/projects/ice40-warmboot[sylefeb/Silice: draft/projects/ice40-warmboot]
+** https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[sylefeb/Silice: draft/projects/ice40-dynboot]
+* https://github.com/greatscottgadgets/luna[greatscottgadgets/luna]
+** https://github.com/greatscottgadgets/luna/pull/80[greatscottgadgets/luna#80]
