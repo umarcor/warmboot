@@ -431,6 +431,12 @@ Chunks of 256 bytes are used.
 The actual HDL is a RISC-V soft core requiring ~2K LUTs.
 Yet, as he explains in https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[sylefeb/Silice: draft/projects/ice40-dynboot], there is room for improvement there!
 
+When using development boards with iCE40 devices which don't use FTDI for programming, `iceprog` cannot be used.
+That is the case of e.g. https://github.com/im-tomu/fomu-hardware[FOMU], which uses `dfu-util`.
+However, @sylefeb found that dfu-util is happy to upload binary files larger than the default bitstream size.
+Hence, data can be concatenated and it is the available at address 262144 (warmboot slot) + 104106 (bitstream size) (
+see https://github.com/im-tomu/foboot/blob/master/doc/FLASHLAYOUT.md[im-tomu/foboot: doc/FLASHLAYOUT.md]).
+
 ==== Compression
 
 From the potentially hundreds of images available in external memory, only five of them can be directly loaded by the FPGA.
