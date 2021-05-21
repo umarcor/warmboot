@@ -513,3 +513,4 @@ _TBW_
 ** https://github.com/greatscottgadgets/luna/pull/80[greatscottgadgets/luna#80]
 * https://github.com/gatecat/hrt[gatecat/hrt]: a proof-of-concept for using partial dynamic reconfiguration on ECP5
   devices.
+* https://hackaday.com/2018/09/27/three-part-deep-dive-explains-lattice-ice40-fpga-details/[hackaday.com: Three Part Deep Dive Explains Lattice ICE40 FPGA Details]
