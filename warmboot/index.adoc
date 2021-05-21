@@ -6,7 +6,7 @@
 
 [.text-center]
 https://github.com/umarcor/warmboot[image:https://img.shields.io/badge/umarcor-warmboot-f2f1ef.svg?longCache=true&style=flat-square&logo=GitHub&logoColor=f2f1ef[title='umarcor/warmboot GitHub repository']]
-https://gitter.im/hdl/community[image:https://img.shields.io/gitter/room/hdl/community.svg?longCache=true&style=flat-square&logo=gitter&logoColor=fff&color=4db797[title='hdl/community on gitter.im']]
+https://gitter.im/im-tomu/warmboot[image:https://img.shields.io/gitter/room/im-tomu/warmboot.svg?longCache=true&style=flat-square&logo=gitter&logoColor=fff&color=4db797&label=im-tomu/warmboot[title='im-tomu/warmboot on gitter.im']]
 https://github.com/hdl/awesome[image:https://img.shields.io/badge/hdl-awesome-f2f1ef.svg?longCache=true&style=flat-square&logo=GitHub&logoColor=f2f1ef[title='hdl/awesome GitHub repository']]
 
 This project is based on https://github.com/YosysHQ/icestorm[YosysHQ/icestorm], which was published and announced in
