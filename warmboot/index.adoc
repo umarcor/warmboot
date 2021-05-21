@@ -511,3 +511,5 @@ _TBW_
 ** https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[sylefeb/Silice: draft/projects/ice40-dynboot]
 * https://github.com/greatscottgadgets/luna[greatscottgadgets/luna]
 ** https://github.com/greatscottgadgets/luna/pull/80[greatscottgadgets/luna#80]
+* https://github.com/gatecat/hrt[gatecat/hrt]: a proof-of-concept for using partial dynamic reconfiguration on ECP5
+  devices.
