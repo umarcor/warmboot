@@ -455,11 +455,16 @@ Some quick experiments show that the size of each bitstream can be reduced to 3-
 ==== Preserving BRAM data
 
 It would be interesting to know whether BRAM data is necessarily overwritten when a new bitstream is loaded.
-If so, it might be possible to use the pipeline approach from Sylvain for hot-replacing the content of the BRAMs when an
-image is changed.
+If that is the case, it might be possible to use the pipeline approach from Sylvain for hot-replacing the content of the
+BRAMs when an image is changed.
 That would allow the implementation of complex algorithms on the same data.
 The advantage would be that freshly loaded images could start computation straightaway after load.
 However, depending on the use case, it might more efficient to have some custom save/load mechanism.
+
+Nevertheless, nextpnr allows specifying absolute placement constraints in the HDL sources.
+See https://github.com/YosysHQ/nextpnr/blob/master/docs/constraints.md#absolute-placement-constraints[YosysHQ/nextpnr: master/docs/constraints.md].
+Hence, that is worth exploring before considering it a dead-end.
+Sylvain did some preliminary tests, without success: https://gitter.im/im-tomu/warmboot?at=60919f992cc8c84d850db0dd[gitter.im/im-tomu/warmboot?at=60919f992cc8c84d850db0dd].
 
 ==== Tests
 
