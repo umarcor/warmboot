@@ -514,8 +514,11 @@ _TBW_
 * https://github.com/sylefeb[@sylefeb]
 ** https://github.com/sylefeb/Silice/blob/draft/projects/ice40-warmboot[sylefeb/Silice: draft/projects/ice40-warmboot]
 ** https://github.com/sylefeb/Silice/tree/draft/projects/ice40-dynboot[sylefeb/Silice: draft/projects/ice40-dynboot]
-* https://github.com/greatscottgadgets/luna[greatscottgadgets/luna]
-** https://github.com/greatscottgadgets/luna/pull/80[greatscottgadgets/luna#80]
 * https://github.com/gatecat/hrt[gatecat/hrt]: a proof-of-concept for using partial dynamic reconfiguration on ECP5
   devices.
 * https://hackaday.com/2018/09/27/three-part-deep-dive-explains-lattice-ice40-fpga-details/[hackaday.com: Three Part Deep Dive Explains Lattice ICE40 FPGA Details]
+* USB CDC ACM
+** https://github.com/no2fpga[no2fpga]
+*** https://github.com/no2fpga/no2muacm[no2fpga/no2muacm]
+** https://github.com/greatscottgadgets/luna[greatscottgadgets/luna]
+*** https://github.com/greatscottgadgets/luna/pull/80[greatscottgadgets/luna#80]
